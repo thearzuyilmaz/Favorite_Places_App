@@ -1,5 +1,7 @@
 import 'package:favorite_places_app/models/place.dart';
+import 'package:favorite_places_app/screens/map_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -71,6 +73,34 @@ class _LocationInputState extends State<LocationInput> {
     widget.transferLocationBack(_pickedLocation!);
   }
 
+  void _getSelectedLocation() async {
+    final userLocation = await Navigator.of(context).push<LatLng>(
+      MaterialPageRoute(
+        builder: (ctx) => const MapScreen(),
+      ),
+    );
+
+    if (userLocation == null) {
+      return;
+    }
+
+    final lat = userLocation.latitude;
+    final lon = userLocation.longitude;
+
+    final url = Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lon&key=$myMapsAPIKey');
+    final response = await http.get(url);
+    final decodedData = json.decode(response.body);
+    final address = decodedData['results'][0]['formatted_address'];
+
+    setState(() {
+      _pickedLocation =
+          PlaceLocation(latitude: lat, longitude: lon, address: address);
+    });
+
+    widget.transferLocationBack(_pickedLocation!);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget previewContent = Text('No location selected',
@@ -116,7 +146,7 @@ class _LocationInputState extends State<LocationInput> {
             ),
             TextButton.icon(
               icon: const Icon(Icons.map),
-              onPressed: () {},
+              onPressed: _getSelectedLocation,
               label: const Text('Select on map'),
             ),
           ],

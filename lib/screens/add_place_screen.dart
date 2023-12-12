@@ -1,4 +1,4 @@
-import 'package:favorite_places_app/providers/favorites_provider.dart';
+import 'package:favorite_places_app/providers/place_provider.dart';
 import 'package:favorite_places_app/widgets/location_input.dart';
 import 'package:flutter/material.dart';
 import 'package:favorite_places_app/models/place.dart';
@@ -39,7 +39,7 @@ class _NewItemScreenState extends ConsumerState<AddPlaceScreen> {
     }
 
     // .notifier is needed to reach to the addToFavorites method of provider
-    ref.read(favoritePlaceProvider.notifier).addToFavorites(newPlace);
+    ref.read(placeProvider.notifier).addPlace(newPlace);
 
     Navigator.of(context).pop();
   }
